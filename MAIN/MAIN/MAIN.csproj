@@ -7,4 +7,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Core\**\*.cs" />
+    <Compile Remove="Shop.Bll\**\*.cs" />
+    <Compile Remove="Shop.Dal\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="Core\Core.csproj" />
+    <ProjectReference Include="Shop.Bll\Shop.Bll.csproj" />
+    <ProjectReference Include="Shop.Dal\Shop.Dal.csproj" />
+  </ItemGroup>
+
 </Project>
