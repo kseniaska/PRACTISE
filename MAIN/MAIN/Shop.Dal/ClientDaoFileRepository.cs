@@ -2,19 +2,11 @@ using Core;
 
 namespace Shop.Dal;
 
-public class ClientDaoFileRepository : IRepository<ClientDao>
+public class ClientDaoFileRepository : RepositoryBase<ClientDao>
 {
     private const string FileName = "clients.txt";
 
-    public void Create(ClientDao item)
-    {
-        using var writer = new StreamWriter(FileName, append: true);
-        writer.WriteLine($"{item.Id},{item.Name},{item.Surname},{item.Patronymic},{item.BirthDay:O}");
-    }
-
-    public ClientDao? Read(int id) => ReadAll().Find(x => x.Id == id);
-
-    public List<ClientDao> ReadAll()
+    public override List<ClientDao> ReadAll()
     {
         var result = new List<ClientDao>();
         if (!File.Exists(FileName)) return result;
@@ -35,21 +27,6 @@ public class ClientDaoFileRepository : IRepository<ClientDao>
         return result;
     }
 
-    public void Update(ClientDao item)
-    {
-        var items = ReadAll();
-        int index = items.FindIndex(x => x.Id == item.Id);
-        if (index >= 0) items[index] = item;
-        Save(items);
-    }
-
-    public void Delete(int id)
-    {
-        var items = ReadAll();
-        items.RemoveAll(x => x.Id == id);
-        Save(items);
-    }
-
-    private static void Save(List<ClientDao> items) =>
+    protected override void Save(List<ClientDao> items) =>
         File.WriteAllLines(FileName, items.Select(x => $"{x.Id},{x.Name},{x.Surname},{x.Patronymic},{x.BirthDay:O}"));
 }

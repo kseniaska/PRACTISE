@@ -1,14 +1,68 @@
-﻿using System;
+﻿using Core;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using Shop.Dal;
 
-namespace MAIN;
+namespace task4;
 
 internal class Program
 {
     static void Main()
     {
+        using var context = new ShopEntityContext("shop.db");
+
+        IRepository<ShopDao> shopRepository =
+            new ShopDaoDataBaseRepository(context);
+
+        IRepository<GoodDao> goodRepository =
+            new GoodDaoDataBaseRepository(context);
+
+        IRepository<ClientDao> clientRepository =
+            new ClientDaoDataBaseRepository(context);
+
+
+        var allShops = shopRepository.ReadAll();
+
+        Console.WriteLine($"Всего магазинов: {allShops.Count}");
+
+        foreach (var shop in allShops)
+        {
+            Console.WriteLine($"{shop.Id}: {shop.Name}, код {shop.Code}");
+        }
+        var shopToUpdate = shopRepository.Read(1000);
+
+        if (shopToUpdate != null)
+        {
+            shopToUpdate.Name = "UpdatedShop";
+            shopToUpdate.Code = 2000;
+
+            shopRepository.Update(shopToUpdate);
+            var updatedShop = shopRepository.Read(1000);
+            Console.WriteLine(updatedShop == null ? "Update: ошибка" : $"Update: {updatedShop.Name}, код {updatedShop.Code}");
+        }
+        var allShops1 = shopRepository.ReadAll();
+
+        Console.WriteLine($"Всего магазинов: {allShops1.Count}");
+
+        foreach (var shop in allShops1)
+        {
+            Console.WriteLine($"{shop.Id}: {shop.Name}, код {shop.Code}");
+        }
+
+        var shopToUpdate1 = shopRepository.Read(1000);
+
+        if (shopToUpdate1 != null)
+        {
+            shopToUpdate1.Name = "UpdatedShop";
+            shopToUpdate1.Code = 2000;
+            shopRepository.Update(shopToUpdate1);
+            var updatedShop = shopRepository.Read(1000);
+            Console.WriteLine(updatedShop == null ? "Update: ошибка" : $"Update: {updatedShop.Name}, код {updatedShop.Code}");
+        }
+
+
+
         ShopDaoFileRepository shopFile = new ShopDaoFileRepository();
         ShopDaoXmlRepository shopXml = new ShopDaoXmlRepository();
         ShopDaoJsonRepository shopJson = new ShopDaoJsonRepository();
@@ -76,6 +130,7 @@ internal class Program
             shopFile.Create(shop);
             shopXml.Create(shop);
             shopJson.Create(shop);
+            shopRepository.Create(shop);
         }
 
         foreach (ClientDao client in clients)
@@ -83,6 +138,7 @@ internal class Program
             clientFile.Create(client);
             clientXml.Create(client);
             clientJson.Create(client);
+            clientRepository.Create(client);
         }
 
         foreach (GoodDao good in goods)
@@ -90,8 +146,12 @@ internal class Program
             goodFile.Create(good);
             goodXml.Create(good);
             goodJson.Create(good);
+            goodRepository.Create(good);
         }
 
         Console.WriteLine("created: shops.txt, shops.xml, shops.json, clients.txt, clients.xml, clients.json, goods.txt, goods.xml, goods.json.");
+
+
+
     }
 }
